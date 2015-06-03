@@ -101,7 +101,7 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 	$scope.select = function (index, app) {
 		$scope.last_selected = $scope.current_selected; 
 		$scope.current_selected = index;
-		$scope.currentapp = app;
+		$scope.currentapp = angular.copy(app);
 	};
 	
 	$scope.isChecked = function (storage) {
@@ -181,12 +181,23 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     };
     
     $scope.updateView = function() {
-		$scope.current_selected = -1;
-    	$scope.last_selected = -1;
+    	 for (i in $scope.apps) {
+             if ($scope.apps[i].id == $scope.currentapp.id)
+                 $scope.apps[i] = angular.copy($scope.currentapp);
+         }
     };
     
     $scope.revertView = function() {
-    	
+    	for (i in $scope.apps) {
+            if ($scope.apps[i].id == $scope.currentapp.id)
+            	$scope.currentapp = angular.copy($scope.apps[i]);
+        }
+    };
+    
+    $scope.reset = function() {
+    	$scope.current_selected = -1;
+    	$scope.last_selected = -1;
+    	//$scope.select(0, $scope.apps[0]);
     };
     
     $scope.openAuth = function() {
@@ -286,6 +297,8 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
                     $scope.$apply();
                 }
 			}
+			
+			//$scope.reset();
 	    });
     };
     
@@ -338,7 +351,7 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
           if (status == 200 || status == 201) {
         	notify('Success', 'Resource updated.');
         	//update view
-
+        	$scope.updateView();
           }
         }).
         error(function(data, status) {
@@ -366,12 +379,12 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     	      if (status == 200) {
     	    	notify('Success', 'Resource deleted.');
     	        //update view
-    	    	var indexOf = $scope.apps.indexOf($scope.currentapp);
+    	    	var indexOf = $scope.apps.indexOf($scope.get($scope.currentapp.id));
     	    	if (indexOf !== -1) {
     	    		$scope.apps.splice(indexOf, 1);
     	    	}
-    	    	
-    	    	$scope.updateView();
+    	    	//update view
+    	    	$scope.reset();
     	      }
     	    }).
     	    error(function(data, status) {
@@ -385,7 +398,7 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     	    	  console.log('Failed', status + data);
     	      }
     	      //revert view
-    	      $scope.revertView();
+    	      //$scope.revertView();
     	});
     };
            
