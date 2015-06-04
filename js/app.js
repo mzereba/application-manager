@@ -195,9 +195,17 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     };
     
     $scope.reset = function() {
-    	$scope.current_selected = -1;
-    	$scope.last_selected = -1;
-    	//$scope.select(0, $scope.apps[0]);
+    	if($scope.apps.length > 0){
+    		$scope.select(0, $scope.apps[0]);
+    		$scope.$digest();
+    	} else {
+    		$scope.current_selected = -1;
+        	$scope.last_selected = -1;
+    	}
+    	
+    	//var myEl = angular.element( document.querySelector( '#app_pannel' ) );
+    	//myEl.addClass('hovering');
+    	//myEl.attr("style", "border: 1px solid #888888; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2)");
     };
     
     $scope.openAuth = function() {
@@ -298,7 +306,7 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
                 }
 			}
 			
-			//$scope.reset();
+			$scope.reset();
 	    });
     };
     
