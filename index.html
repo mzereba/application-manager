@@ -34,7 +34,7 @@
 				</ul>
 			</div>
 			<div class="dropdownblock" ng-if="loggedin" tooltip="{{userProfile.fullname}}" tooltip-placement="bottom">
-				<img src="{{userProfile.image}}" alt="{{userProfile.image}}" style="border:1px solid white;width: 40px;">
+				<img src="{{userProfile.image}}" alt="{{userProfile.image}}" style="border: 1px solid white;width: 40px;height: 40px;">
 			</div>
 		</div>
 		 <div id="content">
@@ -103,7 +103,7 @@
 			    					<label class="no-edit" ng-hide="isEditing" ng-dblclick="isEditing = !isEditing;focus();" tooltip="Double click to edit" tooltip-placement="bottom">{{storage}}</label>
 			    					<input class="edit" ng-show="isEditing" ng-model="storage" ng-focus="isFocused" ng-blur="isEditing = !isEditing;updateStorageName(storage, $index);">
 			    				</td>
-			    				<td align="center"><input class="toggle" type="checkbox" ng-checked="isChecked(storage)" ng-model ="_checked" ng-change="updateStorageVisibility(storage, _checked);" tooltip="View / Hide storage" tooltip-placement="bottom"></td>
+			    				<td align="center"><input class="toggle" type="checkbox" ng-model="isChecked(storage)" ng-click="updateStorageVisibility(storage, !isChecked(storage))" tooltip="View / Hide storage" tooltip-placement="bottom"></td>
 			    				<td><a href="#" ng-click="removeStorage(storage, $index)" tooltip="Remove storage" tooltip-placement="bottom"><i class="fa fa-times fa-lg red"></i></a></td>
 		    				</tr>
 		    			</table>

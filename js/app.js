@@ -32,7 +32,7 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     $scope.current_selected = -1;
     $scope.last_selected = -1;
     $scope.currentapp = {};
-    
+    $scope.v = {};
     $scope.userProfile = {};
         
     var providerURI = '//linkeddata.github.io/signup/index.html?ref=';
@@ -145,12 +145,13 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     			if(storage.indexOf($scope.workspaces[i]) >= 0)
     				$scope.currentapp.visible_workspaces.push($scope.workspaces[i]);
     		}
+    		
+    		var metadata = $scope.metadataTemplate($scope.currentapp);
+        	$scope.update(metadata);
+        	
     	} else {
     		$scope.removeWorkspace(storage);
     	}
-    	
-    	var metadata = $scope.metadataTemplate($scope.currentapp);
-    	$scope.update(metadata);
     };
     
     $scope.removeStorage = function(storage, index) {
@@ -170,14 +171,21 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     };
     
     $scope.removeWorkspace = function(storage) {
-    	for (i in $scope.currentapp.visible_workspaces) {
-			if(storage.indexOf($scope.currentapp.visible_workspaces[i]) >= 0) {
-				var indexOf = $scope.currentapp.visible_workspaces.indexOf($scope.currentapp.visible_workspaces[i]);
-    	    	if (indexOf !== -1) {
-    	    		$scope.currentapp.visible_workspaces.splice(indexOf, 1);
-    	    	}
+    	if($scope.currentapp.visible_workspaces.length == 1) {
+    		notify('Error', 'Removing only storage visible.');
+    	} else {
+	    	for (i in $scope.currentapp.visible_workspaces) {
+				if(storage.indexOf($scope.currentapp.visible_workspaces[i]) >= 0) {
+					var indexOf = $scope.currentapp.visible_workspaces.indexOf($scope.currentapp.visible_workspaces[i]);
+	    	    	if (indexOf !== -1) {
+	    	    		$scope.currentapp.visible_workspaces.splice(indexOf, 1);
+	    	    	}
+				}
 			}
-		}
+	    	
+	    	var metadata = $scope.metadataTemplate($scope.currentapp);
+	    	$scope.update(metadata);
+    	}
     };
     
     $scope.updateView = function() {
@@ -310,7 +318,7 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 	    });
     };
     
-    // Getting workspaces
+    // Gets workspaces
     $scope.getWorkspaces = function () {
 		var g = $rdf.graph();
 	    var f = $rdf.fetcher(g);
