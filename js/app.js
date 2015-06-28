@@ -32,7 +32,6 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     $scope.current_selected = -1;
     $scope.last_selected = -1;
     $scope.currentapp = {};
-    $scope.v = {};
     $scope.userProfile = {};
         
     var providerURI = '//linkeddata.github.io/signup/index.html?ref=';
@@ -105,7 +104,7 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 	};
 	
 	$scope.isChecked = function (storage) {
-		var workspaces = $scope.currentapp.visible_workspaces;
+		var workspaces = $scope.currentapp.enabled_workspaces;
 		for (i in workspaces) {
 			if(storage.indexOf(workspaces[i]) >= 0)
 				return true;
@@ -126,7 +125,7 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 	    $scope.isFocused = true;
 	};
 	    
-    $scope.updateStorageName = function(newstorage, indexstorage) {
+    $scope.renameStorage = function(newstorage, indexstorage) {
     	$scope.isFocused = false;
     	for (var i in $scope.currentapp.storage) {
             if (i == indexstorage) {
@@ -139,11 +138,11 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     	
     };
     
-    $scope.updateStorageVisibility = function(storage, checked) {
+    $scope.enableWorkspace = function(storage, checked) {
     	if(checked){
-    		for (i in $scope.workspaces) {
-    			if(storage.indexOf($scope.workspaces[i]) >= 0)
-    				$scope.currentapp.visible_workspaces.push($scope.workspaces[i]);
+    		for (i in $scope.userProfile.workspaces) {
+    			if(storage.indexOf($scope.userProfile.workspaces[i]) >= 0)
+    				$scope.currentapp.enabled_workspaces.push($scope.userProfile.workspaces[i]);
     		}
     		
     		var metadata = $scope.metadataTemplate($scope.currentapp);
@@ -171,14 +170,14 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     };
     
     $scope.removeWorkspace = function(storage) {
-    	if($scope.currentapp.visible_workspaces.length == 1) {
+    	if($scope.currentapp.enabled_workspaces.length == 1) {
     		notify('Error', 'Removing only storage visible.');
     	} else {
-	    	for (i in $scope.currentapp.visible_workspaces) {
-				if(storage.indexOf($scope.currentapp.visible_workspaces[i]) >= 0) {
-					var indexOf = $scope.currentapp.visible_workspaces.indexOf($scope.currentapp.visible_workspaces[i]);
+	    	for (i in $scope.currentapp.enabled_workspaces) {
+				if(storage.indexOf($scope.currentapp.enabled_workspaces[i]) >= 0) {
+					var indexOf = $scope.currentapp.enabled_workspaces.indexOf($scope.currentapp.enabled_workspaces[i]);
 	    	    	if (indexOf !== -1) {
-	    	    		$scope.currentapp.visible_workspaces.splice(indexOf, 1);
+	    	    		$scope.currentapp.enabled_workspaces.splice(indexOf, 1);
 	    	    	}
 				}
 			}
@@ -237,14 +236,26 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 			var SPACE = $rdf.Namespace('http://www.w3.org/ns/pim/space#');
 			var FOAF = $rdf.Namespace('http://xmlns.com/foaf/0.1/');
 	
-			var evs = g.statementsMatching(undefined, RDF('type'), FOAF('Person'));
-			if (evs != undefined) {
+			var evs = g.statementsMatching($rdf.sym($scope.userProfile.webid), RDF('type'), FOAF('Person'));
+			if (evs.length > 0) {
 				for (var e in evs) {
 					var prfs = g.anyStatementMatching(evs[e]['subject'], SPACE('preferencesFile'))['object']['value'];
 					var fullname = g.anyStatementMatching(evs[e]['subject'], FOAF('name'))['object']['value'];
 					var image = g.anyStatementMatching(evs[e]['subject'], FOAF('img'))['object']['value'];
 					
-					$scope.userProfile.preferencesFile = prfs;
+					if (prfs && prfs.length > 0) {
+                        $scope.userProfile.preferencesFile = prfs;
+                        $scope.getWorkspaces(prfs);
+
+                        var split = $scope.userProfile.preferencesFile.split("/");
+                        var prfsDir = "";
+                        for(var i=0; i<split.length-1; i++){
+                            prfsDir += split[i] + "/";
+                        }
+                        
+                        $scope.userProfile.preferencesDir = prfsDir;
+                    } 
+					
 					$scope.userProfile.fullname = fullname;
 					$scope.userProfile.image = image;
 					$scope.saveCredentials();
@@ -252,7 +263,7 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
                 }
 			}
 			
-			$scope.getWorkspaces();
+			//$scope.getWorkspaces();
 	    });
     };
     
@@ -261,12 +272,7 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 		var g = $rdf.graph();
 	    var f = $rdf.fetcher(g);
 	    $scope.apps.length = 0;
-	    var prefs = $scope.userProfile.preferencesFile;
-	    var split = prefs.split("/");
-	    var uri = "";
-	    for(var i=0; i<split.length-1; i++){
-    		uri += split[i] + "/";
-	    }
+	    var uri = $scope.userProfile.preferencesDir;
 	    
 	    f.nowOrWhenFetched(uri + '*',undefined,function(){	
 		    var DC = $rdf.Namespace('http://purl.org/dc/elements/1.1/');
@@ -287,6 +293,8 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 					
 					var app_url = g.anyStatementMatching(evs[e]['subject'], APP('app-url'))['object']['value'];
 					
+					var index = g.anyStatementMatching(evs[e]['subject'], APP('index'))['object']['value'];
+					
 					var storages_array = g.statementsMatching(evs[e]['subject'], SPACE('storage'));
 					var storages = [];
 					for (var s in storages_array) {
@@ -304,9 +312,10 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 					    title: title,
 					    types: types,
 					    storage: storages,
-					    visible_workspaces: workspaces,
+					    enabled_workspaces: workspaces,
 					    logo: logo,
 					    url: app_url,
+					    index_file: index
 					};
 
 					$scope.apps.push(app);
@@ -319,31 +328,27 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     };
     
     // Gets workspaces
-    $scope.getWorkspaces = function () {
+    $scope.getWorkspaces = function (uri) {
 		var g = $rdf.graph();
 	    var f = $rdf.fetcher(g);
-	    var uri = $scope.userProfile.preferencesFile;
-	    
-	    f.nowOrWhenFetched(uri + '*',undefined,function(){	
+	    f.nowOrWhenFetched(uri,undefined,function(){	
 		    var DC = $rdf.Namespace('http://purl.org/dc/elements/1.1/');
 			var RDF = $rdf.Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
-			var TYPE = $rdf.Namespace('https://example.com/');
 			var SPACE = $rdf.Namespace('http://www.w3.org/ns/pim/space#');
 	
-			var evs = g.statementsMatching(undefined, RDF('type'), TYPE('prefs'));
-			if (evs != undefined) {
+			var evs = g.statementsMatching($rdf.sym($scope.userProfile.webid), SPACE('preferencesFile'), $rdf.sym(uri));
+			if (evs.length > 0) {
+                var workspaces = [];
 				for (var e in evs) {
 					var ws = g.statementsMatching(evs[e]['subject'], SPACE('workspace'));
 					
 					for (var s in ws) {
 						var workspace = ws[s]['object']['value'];
-						//var splitted = workspace.split("/");
-						//$scope.workspaces.push(splitted[3]);
-						$scope.workspaces.push(workspace);
+						workspaces.push(workspace);
 					}
-										
-                    $scope.$apply();
+                    //$scope.$apply();
                 }
+                $scope.userProfile.workspaces = workspaces;
 			}
 			
 			$scope.getPreferences();
@@ -428,16 +433,17 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
  		}
     	
     	var workspace_string = "";
-    	for(i in app.visible_workspaces){
-    		workspace_string += "<" + app.visible_workspaces[i] + ">";
-    		if(i != app.visible_workspaces.length-1)
+    	for(i in app.enabled_workspaces){
+    		workspace_string += "<" + app.enabled_workspaces[i] + ">";
+    		if(i != app.enabled_workspaces.length-1)
     			workspace_string += ", ";
  		}
     	
     	var rdf = "<" + app.id + ">\n" +
-          		 "a <http://www.w3.org/2000/01/rdf-schema#Resource>, <https://example.com/application> ;\n" +
+          		 "a <https://example.com/application> ;\n" +
           		 "<http://purl.org/dc/elements/1.1/title> \"" + app.title + "\" ;\n" +
           		 "<https://example.com/app-url> <" + app.url + "> ;\n" + 
+          		 "<https://example.com/index> <" + app.index_file + "> ;\n" +
           		 "<https://example.com/logo> <" + app.logo + "> ;\n" +
           		 "<https://example.com/types> <" + app.types + "> ;\n" +
           		 "<http://www.w3.org/ns/pim/space#storage> " + storage_string + " ;\n" +
@@ -469,7 +475,6 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
           //  $scope.userProfile = {};
           //}
           $scope.userProfile = app.userProfile;
-          $scope.path = $scope.userProfile.storage + "contacts/";
           $scope.getUserInfo();
           $scope.loggedin = true;
         } else {

@@ -101,9 +101,9 @@
 		    				<tr ng-repeat="storage in currentapp.storage">
 			    				<td>
 			    					<label class="no-edit" ng-hide="isEditing" ng-dblclick="isEditing = !isEditing;focus();" tooltip="Double click to edit" tooltip-placement="bottom">{{storage}}</label>
-			    					<input class="edit" ng-show="isEditing" ng-model="storage" ng-focus="isFocused" ng-blur="isEditing = !isEditing;updateStorageName(storage, $index);">
+			    					<input class="edit" ng-show="isEditing" ng-model="storage" ng-focus="isFocused" ng-blur="isEditing = !isEditing;renameStorage(storage, $index);">
 			    				</td>
-			    				<td align="center"><input class="toggle" type="checkbox" ng-model="isChecked(storage)" ng-click="updateStorageVisibility(storage, !isChecked(storage))" tooltip="View / Hide storage" tooltip-placement="bottom"></td>
+			    				<td align="center"><input class="toggle" type="checkbox" ng-model="isChecked(storage)" ng-click="enableWorkspace(storage, !isChecked(storage))" tooltip="View / Hide storage" tooltip-placement="bottom"></td>
 			    				<td><a href="#" ng-click="removeStorage(storage, $index)" tooltip="Remove storage" tooltip-placement="bottom"><i class="fa fa-times fa-lg red"></i></a></td>
 		    				</tr>
 		    			</table>
