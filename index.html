@@ -56,11 +56,21 @@
 				<hr class="hrright">
 				<div id="settings_pannel_left" ng-if="current_selected != -1">
 			    	<div id="settings_higher_section">
-			    		<h4 class="space">
-			    			<i class="fa fa-file-o"></i>&nbsp;
-			    			Data Types
-			    		</h4>
-			    		{{currentapp.types}}
+			    		<table>
+		    				<tr>
+		    					<td>
+			    					<h4>
+						    			<i class="fa fa-file-o"></i>&nbsp;
+						    			Data Types
+						    		</h4>
+			    				</td>
+		    				</tr>
+		    				<tr ng-repeat="type in currentapp.types">
+			    				<td>
+			    					{{type}}
+			    				</td>
+		    				</tr>
+		    			</table>
 			    	</div>
 			    	<!-- 
 			    	<div id="settings_middle_section">

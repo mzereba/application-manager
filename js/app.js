@@ -286,14 +286,18 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 					var id = evs[e]['subject']['value'];
 					
 					var title = g.anyStatementMatching(evs[e]['subject'], DC('title'))['object']['value'];
-					
-					var types = g.anyStatementMatching(evs[e]['subject'], APP('types'))['object']['value'];
-					
+										
 					var logo = g.anyStatementMatching(evs[e]['subject'], APP('logo'))['object']['value'];
 					
 					var app_url = g.anyStatementMatching(evs[e]['subject'], APP('app-url'))['object']['value'];
 					
-					var index = g.anyStatementMatching(evs[e]['subject'], APP('index'))['object']['value'];
+					//var index = g.anyStatementMatching(evs[e]['subject'], APP('index'))['object']['value'];
+					
+					var types_array = g.statementsMatching(evs[e]['subject'], APP('types'));
+					var types = [];
+					for (var t in types_array) {
+						types.push(types_array[t]['object']['value']);
+					}
 					
 					var storages_array = g.statementsMatching(evs[e]['subject'], SPACE('storage'));
 					var storages = [];
@@ -315,7 +319,7 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 					    enabled_workspaces: workspaces,
 					    logo: logo,
 					    url: app_url,
-					    index_file: index
+					    //index_file: index
 					};
 
 					$scope.apps.push(app);
@@ -439,13 +443,22 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     			workspace_string += ", ";
  		}
     	
+    	var sTypes = "";
+	    if(app.types.length > 0) {
+    		for(i in $scope.apptypes) {
+    			sTypes += "<" + $scope.apptypes[i] + ">";
+    			if(i != $scope.apptypes.length-1)
+    				sTypes += ", ";	    				
+     		}
+    	}
+    	
     	var rdf = "<" + app.id + ">\n" +
           		 "a <https://example.com/application> ;\n" +
           		 "<http://purl.org/dc/elements/1.1/title> \"" + app.title + "\" ;\n" +
           		 "<https://example.com/app-url> <" + app.url + "> ;\n" + 
           		 "<https://example.com/index> <" + app.index_file + "> ;\n" +
           		 "<https://example.com/logo> <" + app.logo + "> ;\n" +
-          		 "<https://example.com/types> <" + app.types + "> ;\n" +
+          		 "<https://example.com/types> " + sTypes + " ;\n" +
           		 "<http://www.w3.org/ns/pim/space#storage> " + storage_string + " ;\n" +
     			 "<http://www.w3.org/ns/pim/space#workspace> " + workspace_string + " .";
        
