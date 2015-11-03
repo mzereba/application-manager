@@ -37,7 +37,10 @@
 				<img src="{{userProfile.image}}" alt="{{userProfile.image}}" style="border: 1px solid white;width: 40px;height: 40px;">
 			</div>
 		</div>
-		 <div id="content">
+		<div id="content" ng-hide="loggedin">
+			<p class="big-title">You are not logged in</p>
+		</div>
+		 <div id="content" ng-show="loggedin">
 	    	<div id="left_pannel">
 		    	<h3>
 		    		<i class="fa fa-cog"></i> 
