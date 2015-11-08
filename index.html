@@ -38,7 +38,7 @@
 			</div>
 		</div>
 		<div id="content" ng-hide="loggedin">
-			<p class="big-title">You are not logged in</p>
+			<p class="big-title">Please click<a href="#" ng-hide="loggedin" ng-click="openAuth()" style="color: #777777;">&nbsp;<i class="fa fa-sign-in fa-2x"></i></a>&nbsp;to login</p>
 		</div>
 		 <div id="content" ng-show="loggedin">
 	    	<div id="left_pannel">
