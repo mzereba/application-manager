@@ -241,7 +241,13 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 				for (var e in evs) {
 					var prfs = g.anyStatementMatching(evs[e]['subject'], SPACE('preferencesFile'))['object']['value'];
 					var fullname = g.anyStatementMatching(evs[e]['subject'], FOAF('name'))['object']['value'];
-					var image = g.anyStatementMatching(evs[e]['subject'], FOAF('img'))['object']['value'];
+					
+					var imagePredicate = g.anyStatementMatching(evs[e]['subject'], FOAF('img'));
+					var image = "";
+					if(imagePredicate != null)
+						image = imagePredicate ['object']['value'];
+					else
+						image = $scope.appurl + "images/generic_photo.png";
 					
 					if (prfs && prfs.length > 0) {
                         $scope.userProfile.preferencesFile = prfs;
