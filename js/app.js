@@ -473,9 +473,12 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     	var rdf = "<" + app.id + ">\n" +
           		 "a <https://example.com/application> ;\n" +
           		 "<http://purl.org/dc/elements/1.1/title> \"" + app.title + "\" ;\n" +
-          		 "<https://example.com/app-url> <" + app.url + "> ;\n" + 
-          		 "<https://example.com/index> <" + app.index_file + "> ;\n" +
-          		 "<https://example.com/logo> <" + app.logo + "> ;\n" +
+          		 "<https://example.com/app-url> <" + app.url + "> ;\n"; 
+          		 
+    	if(app.title == "Contacts")
+    	  rdf += "<https://example.com/index> <" + app.index_file + "> ;\n";
+          		 
+    	  rdf += "<https://example.com/logo> <" + app.logo + "> ;\n" +
           		 "<https://example.com/types> " + sTypes + " ;\n" +
           		 "<http://www.w3.org/ns/pim/space#storage> " + storage_string + " ;\n" +
     			 "<http://www.w3.org/ns/pim/space#workspace> " + workspace_string + " .";
