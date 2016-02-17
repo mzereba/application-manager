@@ -296,9 +296,7 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 					var logo = g.anyStatementMatching(evs[e]['subject'], APP('logo'))['object']['value'];
 					
 					var app_url = g.anyStatementMatching(evs[e]['subject'], APP('app-url'))['object']['value'];
-					
-					//var index = g.anyStatementMatching(evs[e]['subject'], APP('index'))['object']['value'];
-					
+										
 					var types_array = g.statementsMatching(evs[e]['subject'], APP('types'));
 					var types = [];
 					for (var t in types_array) {
@@ -317,16 +315,30 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 						workspaces.push(workspaces_array[w]['object']['value']);
 					}
 					
-					var app = {
-					    id: id,
-					    title: title,
-					    types: types,
-					    storage: storages,
-					    enabled_workspaces: workspaces,
-					    logo: logo,
-					    url: app_url,
-					    //index_file: index
-					};
+					if(title == "Contacts") {
+						var index = g.anyStatementMatching(evs[e]['subject'], APP('index'))['object']['value'];
+					
+						var app = {
+						    id: id,
+						    title: title,
+						    types: types,
+						    storage: storages,
+						    enabled_workspaces: workspaces,
+						    logo: logo,
+						    url: app_url,
+						    index_file: index
+						};
+					} else {
+						var app = {
+							    id: id,
+							    title: title,
+							    types: types,
+							    storage: storages,
+							    enabled_workspaces: workspaces,
+							    logo: logo,
+							    url: app_url,
+						};
+					}
 
 					$scope.apps.push(app);
                     $scope.$apply();
@@ -451,9 +463,9 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     	
     	var sTypes = "";
 	    if(app.types.length > 0) {
-    		for(i in $scope.apptypes) {
-    			sTypes += "<" + $scope.apptypes[i] + ">";
-    			if(i != $scope.apptypes.length-1)
+    		for(i in app.types) {
+    			sTypes += "<" + app.types[i] + ">";
+    			if(i != app.types.length-1)
     				sTypes += ", ";	    				
      		}
     	}
@@ -461,9 +473,12 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     	var rdf = "<" + app.id + ">\n" +
           		 "a <https://example.com/application> ;\n" +
           		 "<http://purl.org/dc/elements/1.1/title> \"" + app.title + "\" ;\n" +
-          		 "<https://example.com/app-url> <" + app.url + "> ;\n" + 
-          		 "<https://example.com/index> <" + app.index_file + "> ;\n" +
-          		 "<https://example.com/logo> <" + app.logo + "> ;\n" +
+          		 "<https://example.com/app-url> <" + app.url + "> ;\n"; 
+          		 
+    	if(app.title == "Contacts")
+    	  rdf += "<https://example.com/index> <" + app.index_file + "> ;\n";
+          		 
+    	  rdf += "<https://example.com/logo> <" + app.logo + "> ;\n" +
           		 "<https://example.com/types> " + sTypes + " ;\n" +
           		 "<http://www.w3.org/ns/pim/space#storage> " + storage_string + " ;\n" +
     			 "<http://www.w3.org/ns/pim/space#workspace> " + workspace_string + " .";
