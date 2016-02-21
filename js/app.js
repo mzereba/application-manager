@@ -240,7 +240,13 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
 			if (evs.length > 0) {
 				for (var e in evs) {
 					var prfs = g.anyStatementMatching(evs[e]['subject'], SPACE('preferencesFile'))['object']['value'];
-					var fullname = g.anyStatementMatching(evs[e]['subject'], FOAF('name'))['object']['value'];
+					
+					var fullnamePredicate = g.anyStatementMatching(evs[e]['subject'], FOAF('name'));
+					var fullname = "";
+					if(fullnamePredicate != null)
+						fullname = fullnamePredicate ['object']['value'];
+					else
+						fullname = $scope.userProfile.webid;
 					
 					var imagePredicate = g.anyStatementMatching(evs[e]['subject'], FOAF('img'));
 					var image = "";
