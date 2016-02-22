@@ -33,6 +33,8 @@ app.controller('AppManagerController', function ($scope, $http, $sce) {
     $scope.last_selected = -1;
     $scope.currentapp = {};
     $scope.userProfile = {};
+    
+    $scope.appurl = "http://mzereba.github.io/application-manager/";
         
     var providerURI = '//linkeddata.github.io/signup/index.html?ref=';
     $scope.widgetURI = $sce.trustAsResourceUrl(providerURI+window.location.protocol+'//'+window.location.host);
