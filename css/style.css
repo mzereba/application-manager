@@ -396,3 +396,26 @@ p.big-title {
     font-size: 32px;
     color: #777777;
 }
+.footer {
+	margin-top: 400px;
+    text-align: center;
+    font-size: 12px;
+    clear: left;
+    position: static;
+}
+.grey {
+	/*color: #777777;*/
+	font-size: 12px;
+}
+.black {
+	color: #000000;
+}
+a.link-color {
+	color: #777777;
+	font-size: 12px;
+}
+a.link-color:hover {
+	color: #777777;
+	font-size: 12px;
+	text-decoration: underline;
+}

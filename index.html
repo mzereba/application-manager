@@ -40,7 +40,7 @@
 		<div id="content" ng-hide="loggedin">
 			<p class="big-title">Please click<a href="#" ng-hide="loggedin" ng-click="openAuth()" style="color: #777777;">&nbsp;<i class="fa fa-sign-in fa-2x"></i></a>&nbsp;to login</p>
 		</div>
-		 <div id="content" ng-show="loggedin">
+		<div id="content" ng-show="loggedin">
 	    	<div id="left_pannel">
 		    	<h3>
 		    		<i class="fa fa-cog"></i> 
@@ -125,6 +125,11 @@
 		    	</div>
 		    </div>
 		</div>
+		<div class="footer" ng-show="loggedin">
+	      <p class="grey">
+	        © 2016 <i class="fa fa-cogs black"></i> Application Manager | <a href="https://github.com/mzereba/application-manager" class="link-color"><i class="fa fa-github"></i> Source</a> | <a href="https://github.com/mzereba/application-manager/issues" class="link-color"><i class="fa fa-bug"></i> Issues</a>
+	      </p>
+	    </div>
 		<div modal="authenticationModal" ng-include="'templates/authenticationModal.htm'" close="cancel()"></div>
 	</body>
 </html>
